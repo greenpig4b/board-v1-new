@@ -2,6 +2,7 @@ package shop.mtcoding.blog.board;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CurrentTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -17,5 +18,6 @@ public class Board { // User 1 -> Board N
 
     private int userId; // 테이블에 만들어 질때 user_id
 
+    @CurrentTimestamp
     private LocalDateTime createdAt;
 }
