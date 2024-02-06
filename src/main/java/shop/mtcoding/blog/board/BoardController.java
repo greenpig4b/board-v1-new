@@ -1,18 +1,23 @@
 package shop.mtcoding.blog.board;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
+import shop.mtcoding.blog.user.User;
 
 import java.util.List;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor //final 붙은애들생성자만들어줌
 @Controller
 public class BoardController {
+    //세션에 접근하는방법
+    //1. 생성자주입
 
+    private final HttpSession session;
     private final BoardRepository boardRepository;
 
     @GetMapping({ "/", "/board" })
@@ -26,7 +31,13 @@ public class BoardController {
 
     @GetMapping("/board/saveForm")
     public String saveForm() {
-        return "board/saveForm";
+    User sessionuser  = (User)session.getAttribute("sessionUser");
+        if (sessionuser == null){
+            return "redirect:/loginForm";
+        }
+
+    return "board/saveForm";
+
     }
 
     @GetMapping("/board/{id}")
