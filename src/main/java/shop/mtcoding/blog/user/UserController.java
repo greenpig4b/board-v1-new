@@ -65,6 +65,7 @@ public String login(UserRequest.LoginDTO requestDTO){
 
     @GetMapping("/logout")
     public String logout() {
+        session.invalidate(); //서랍 비우기
         return "redirect:/";
     }
 }
