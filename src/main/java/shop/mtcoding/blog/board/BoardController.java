@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import shop.mtcoding.blog.user.User;
 
@@ -38,6 +39,29 @@ public class BoardController {
 
     return "board/saveForm";
 
+    }
+
+    @PostMapping("/board/save")
+    public String save(BoardRequest.SaveDTO requestDTO,HttpServletRequest request){
+        // 1. 인증체크
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if (sessionUser == null){
+            return "redirect:loginForm";
+        }
+
+        // 2. 바디데이터 확인 및 유효성검사
+        System.out.println(requestDTO);
+
+        if (requestDTO.getTitle().length() > 30){
+            request.setAttribute("status",400);
+            request.setAttribute("msg","title의 길이가 30자를 초과해서는 안됩니다.");
+            return "error/40x"; //BadRequest
+        }
+        // 3. 모델 위임
+        //insert into board_tb(title,content,user_id) values(?,?,?,now());
+
+        boardRepository.save(requestDTO,sessionUser.getId());
+        return "redirect:/";
     }
 
     @GetMapping("/board/{id}")
