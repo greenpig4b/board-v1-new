@@ -4,11 +4,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import shop.mtcoding.blog.user.User;
+import shop.mtcoding.blog.user.UserRepository;
+import shop.mtcoding.blog.user.UserRequest;
 
 import java.util.List;
 
@@ -20,6 +19,32 @@ public class BoardController {
 
     private final HttpSession session;
     private final BoardRepository boardRepository;
+    //RequestBody를 쓰면 오브젝트를 json으로 받아옴
+
+
+
+
+
+    @PostMapping("/board/{id}/update")
+    public String update(@PathVariable int id, BoardRequest.UpdateDTO requestDTO){
+        //로그인되있어야함(부가로직)
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if (sessionUser == null){
+            return "redirect:/loginForm";
+        }
+
+        //권한체크(부가로직)
+        Board board = boardRepository.fintdById(id);
+        if (board.getUserId() != sessionUser.getId()){
+            return "error/403";
+        }
+
+        //핵심로직
+        //update board_tb set title = ?,content = ? where id = ?;
+        boardRepository.update(requestDTO,id);
+
+        return "redirect:/board/"+id;
+    }
 
     @GetMapping("/board/{id}/updateForm")
     public String updateForm(@PathVariable int id,HttpServletRequest request){
@@ -36,17 +61,11 @@ public class BoardController {
             return "error/403";
         }
 
-
         //가방에 담기
         request.setAttribute("board",board);
 
-
         return "board/updateForm";
     }
-
-
-
-
 
 
     @PostMapping("/board/{id}/delete")

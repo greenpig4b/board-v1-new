@@ -8,7 +8,7 @@
     <div class="card">
         <div class="card-header"><b>회원수정을 해주세요</b></div>
         <div class="card-body">
-            <form action="/user/update" method="post" enctype="application/x-www-form-urlencoded">
+            <form action="/user/{{sessionUser.id}}/update" method="post" enctype="application/x-www-form-urlencoded">
                 <div class="mb-3">
                     <input type="text" class="form-control" placeholder="Enter username" name="username" disabled>
                 </div>

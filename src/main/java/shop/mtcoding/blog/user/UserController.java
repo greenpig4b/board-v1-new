@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 
@@ -58,14 +59,32 @@ public String login(UserRequest.LoginDTO requestDTO){
         return "user/loginForm";
     }
 
-    @GetMapping("/user/updateForm")
-    public String updateForm() {
+
+    @GetMapping("/user/{id}/updateForm")
+    public String updateForm(@PathVariable int id, HttpServletRequest request) {
+        //필수로직
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if (sessionUser == null){
+            return "redirect:/loginForm";
+        }
+
         return "user/updateForm";
     }
+
+    @PostMapping("/user/{id}/update")
+    public String passwordUpdate(@PathVariable int id, UserRequest.UpdatePssswordDTO requestDTO){
+
+        userRepository.setByPassword(requestDTO,id);
+
+        return "redirect:/";
+    }
+
 
     @GetMapping("/logout")
     public String logout() {
         session.invalidate(); //서랍 비우기
         return "redirect:/";
     }
+
+
 }
