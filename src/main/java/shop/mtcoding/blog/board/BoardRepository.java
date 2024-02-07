@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public class BoardRepository {
     private final EntityManager em;
-
+    //join subquery order by 서버 부하가 크다
     public List<Board> findAll(){
         Query query = em.createNativeQuery("select * from board_tb order by id desc", Board.class);
         return query.getResultList();
