@@ -23,15 +23,15 @@ public class BoardController {
     private final HttpSession session;
     private final BoardRepository boardRepository;
 
+
     @PostMapping("/board/{id}/update")
-    public String update(@PathVariable int id, BoardRequest.UpdateDTO requestDTO){
-        //로그인되있어야함(부가로직)
-        User sessionUser = (User) session.getAttribute("sessionUser");
+    public String update(@PathVariable int id, BoardRequest.UpdateDTO requestDTO,@AuthenticationPrincipal MyLoginUser myLoginUser){
+
 
 
         //권한체크(부가로직)
         Board board = boardRepository.fintdById(id);
-        if (board.getUserId() != sessionUser.getId()){
+        if (board.getUserId() != myLoginUser.getUser().getId() ){
             return "error/403";
         }
 
@@ -45,15 +45,14 @@ public class BoardController {
 
 
     @GetMapping("/board/{id}/updateForm")
-    public String updateForm(@PathVariable int id,HttpServletRequest request){
-        //인증체크
-        User sessionUser = (User) session.getAttribute("sessionUser");
+    public String updateForm(@PathVariable int id,HttpServletRequest request,@AuthenticationPrincipal MyLoginUser myLoginUser){
+
 
 
         //권한체크
         //모델위임 (id로 board조회)
         Board board = boardRepository.fintdById(id);
-        if (board.getUserId() != sessionUser.getId()){
+        if (board.getUserId() != myLoginUser.getUser().getId()){
             return "error/403";
         }
 
@@ -64,15 +63,12 @@ public class BoardController {
     }
 
     @PostMapping("/board/{id}/delete")
-    public String delete(@PathVariable int id,HttpServletRequest request){
-
-        // 인증안되면 나가게
-        User sessionuser = (User) session.getAttribute("sessionUser");
+    public String delete(@PathVariable int id,HttpServletRequest request,@AuthenticationPrincipal MyLoginUser myLoginUser){
 
 
         // 권한이없으면 나가
         Board board = boardRepository.fintdById(id);
-        if (board.getUserId() != sessionuser.getId()){
+        if (board.getUserId() != myLoginUser.getUser().getId()){
             request.setAttribute("status",403);
             request.setAttribute("msg","권한이없습니다");
             return "error/40x";
@@ -85,7 +81,7 @@ public class BoardController {
     }
     @GetMapping({ "/"})
     public String index(HttpServletRequest request,@AuthenticationPrincipal MyLoginUser myLoginUser) {
-        System.out.println("값이나왔습니다 값이나왔습니다"+myLoginUser);
+
         List<Board> boardList = boardRepository.findAll();
         request.setAttribute("boardList", boardList);
 
@@ -94,17 +90,13 @@ public class BoardController {
 
     @GetMapping("/board/saveForm")
     public String saveForm() {
-    User sessionuser  = (User)session.getAttribute("sessionUser");
-
 
     return "board/saveForm";
 
     }
 
     @PostMapping("/board/save")
-    public String save(BoardRequest.SaveDTO requestDTO,HttpServletRequest request){
-        // 1. 인증체크
-        User sessionUser = (User) session.getAttribute("sessionUser");
+    public String save(BoardRequest.SaveDTO requestDTO,HttpServletRequest request,@AuthenticationPrincipal MyLoginUser myLoginUser){
 
 
         // 2. 바디데이터 확인 및 유효성검사
@@ -118,7 +110,7 @@ public class BoardController {
         // 3. 모델 위임
         //insert into board_tb(title,content,user_id) values(?,?,?,now());
 
-        boardRepository.save(requestDTO,sessionUser.getId());
+        boardRepository.save(requestDTO,myLoginUser.getUser().getId());
 
         return "redirect:/";
     }
@@ -128,7 +120,6 @@ public class BoardController {
         //System.out.println("id : "+id);
         // 1.모델진입 - 상세보기 데이터가져오기
         BoardResponse.DetailDTO responseDTO = boardRepository.findByIdWithUser(id);
-
 
         // 2.페이지 주입여부 체크(board의 user_id와 session user_id 비교)
         User sessionUser = (User) session.getAttribute("sessionUser");

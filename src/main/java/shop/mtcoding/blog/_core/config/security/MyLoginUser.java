@@ -1,5 +1,6 @@
 package shop.mtcoding.blog._core.config.security;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,7 +11,7 @@ import java.util.Collection;
 //세션에 담길 유저 오브젝트(객체)
 //세션에 담기전에 매서드호출
 @RequiredArgsConstructor
-
+@Getter
 public class MyLoginUser implements UserDetails {
 
     private final User user;
@@ -51,4 +52,5 @@ public class MyLoginUser implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
     }
+
 }

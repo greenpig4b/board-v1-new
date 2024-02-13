@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
 @Configuration //컴퍼넌트 스캔 - 설정파일
 // 컨트롤러 ,레파지토리 ,컨피규레이션 ,컴퍼넌트
@@ -13,12 +14,12 @@ public class SecurityConfig {
 
     @Bean //디폴트값
      public BCryptPasswordEncoder encoder(){
-         return new BCryptPasswordEncoder();
+         return new BCryptPasswordEncoder(); // 어떤해쉬로 비교할지 알게됨, IOC등록
      }
 
     //간단하게 할수없는 요청은 ignore로 예외처리
     @Bean
-    public WebSecurityCustomizer ignore(){
+    public WebSecurityCustomizer ignore(){ //정적파일,데이터에서만 사용
         return w -> w.ignoring().requestMatchers("/board/*","/static/**","/h2-console/**");
     }
 
@@ -30,7 +31,8 @@ public class SecurityConfig {
         http.csrf(c ->c.disable() );
 
         http.authorizeHttpRequests(a -> {
-            a.requestMatchers("/user/updateForm","/board/**").authenticated()
+           a.requestMatchers(RegexRequestMatcher.regexMatcher("/board/\\d+")).permitAll()
+                    .requestMatchers("/user/**","/board/**").authenticated()
                     .anyRequest().permitAll();
         });
 
