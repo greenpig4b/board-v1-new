@@ -7,6 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import shop.mtcoding.blog._core.util.Script;
 
 
 @RequiredArgsConstructor // final이 붙은 애들에 대한 생성자를 만들어줌
@@ -23,7 +25,6 @@ public class UserController {
 @PostMapping("/login")
 public String login(UserRequest.LoginDTO requestDTO){
 
-
     System.out.println(requestDTO); // toString -> @Data
 
     if(requestDTO.getUsername().length() < 3){
@@ -31,12 +32,7 @@ public String login(UserRequest.LoginDTO requestDTO){
     }
 
     User user = userRepository.findByUsernameAndPassword(requestDTO);
-
-    if(user == null){ // 조회 안됨 (401)
-        return "error/401";
-    }else{ // 조회 됐음 (인증됨)
-        session.setAttribute("sessionUser", user); // 락카에 담음 (StateFul)
-    }
+    session.setAttribute("sessionUser", user); // 락카에 담음 (StateFul)
 
     return "redirect:/"; // 컨트롤러가 존재하면 무조건 redirect 외우기
 }
@@ -44,9 +40,15 @@ public String login(UserRequest.LoginDTO requestDTO){
     @PostMapping("/join")
     public String join(UserRequest.JoinDTO requestDTO){
         System.out.println(requestDTO);
+        //ssar 조회해야함
 
-        userRepository.save(requestDTO); // 모델에 위임하기
-        return "redirect:/loginForm";
+        try{
+            userRepository.save(requestDTO); // 모델에 위임하기
+        }catch (Exception e){
+            throw new RuntimeException("아이디가 중복되었습니다");
+        }
+
+        return "redirect:loginForm";
     }
 
     @GetMapping("/joinForm")
