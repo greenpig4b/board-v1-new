@@ -19,6 +19,7 @@ public class BoardController {
 
     private final HttpSession session;
     private final BoardRepository boardRepository;
+
     //RequestBody를 쓰면 오브젝트를 json으로 받아옴
 
 
@@ -133,7 +134,6 @@ public class BoardController {
 
         return "redirect:/";
     }
-
 
     @GetMapping("/board/{id}")
     public String detail(@PathVariable int id, HttpServletRequest request) {

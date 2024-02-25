@@ -54,13 +54,10 @@ public class UserRepository {
             User user = (User) query.getSingleResult();
             return user;
         } catch (Exception e) {
-            throw new RuntimeException("아이디를 찾을 수 없습니다.");
+            return null;
         }
 
     }
-
-
-
 
     @Transactional
     public void setByPassword(UserRequest.UpdatePssswordDTO requestDTO, int id){
